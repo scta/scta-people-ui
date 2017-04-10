@@ -81,7 +81,7 @@ post '/update' do
     "@id": "http://scta.info/resource/#{id}",
     "@type": "http://scta.info/resource/person",
     "dc:title": "#{title}",
-    "sctap:personType": "http://scta.info/resource/#{persontype}",
+    "sctap:personType": persontype,
     "sctap:shortId": "#{id}"
   }
 
@@ -117,8 +117,32 @@ post '/update' do
 
 end
 get '/:shortid' do |shortid|
-  file = open("https://api.github.com/repos/scta/scta-people/contents/graphs/#{shortid}.jsonld", http_basic_authentication: ["jeffreycwitt", "01d386bcdb3f8f54b257b422eaba7d3730199334"]).read
-  @data = JSON.parse(file)
-  @content = JSON.parse(Base64.decode64(@data["content"]))
+  @edit_branch_title = if params[:branch] then params[:branch] else "master" end
+
+ begin
+  file = open("https://api.github.com/repos/scta/scta-people/contents/graphs/#{shortid}.jsonld", http_basic_authentication: ["jeffreycwitt", ENV['GITHUB_AUTH_TOKEN']]).read
+ rescue OpenURI::HTTPError
+   @data = false
+ else
+   @data = JSON.parse(file)
+   @content = JSON.parse(Base64.decode64(@data["content"]))
+ end
+
+
+
+  branch_file = open("https://api.github.com/repos/scta/scta-people/contents/graphs/#{shortid}.jsonld?ref=develop", http_basic_authentication: ["jeffreycwitt", ENV['GITHUB_AUTH_TOKEN']]).read
+  @branch_data = JSON.parse(branch_file)
+  @branch_content = JSON.parse(Base64.decode64(@branch_data["content"]))
+
+  @edit_branch_content =
+  if params[:branch] == "master" then
+    if @data != false
+      @content
+    else
+      @branch_content
+    end
+  else 
+    @branch_content
+  end
   erb :people_editor
 end

@@ -1,37 +1,65 @@
-<div>
-  <h1><%= @content["dc:title"] %></h1>
-  <p>Current record hash: <%= @data["sha"] %></h2>
-  <p>Current path: <a href="<%= @data["url"] %>"><%= @data["url"] %></a></h2>
-  <table>
-    <% @content.each do |k,v| %>
-    <tr>
-      <td><%= k %></td>
-      <td><%= v %></td>
-    </tr>
-    <% end %>
-  </table>
-</div>
-<div>
-  <h1>Edit Record</h2>
-    <form method="post" action="update">
+<div class="row container" >
+  <div class="col-md-6">
+    <% if @data != false %>
+      <h2>SCTA MASTER RECORD <%= @content["dc:title"] %></h2>
+      <p>Current record hash: <%= @data["sha"] %></h2>
+      <p>Current path: <a href="<%= @data["url"] %>"><%= @data["url"] %></a></h2>
       <table>
         <% @content.each do |k,v| %>
-          <% unless k === "@context" || k == "@id" || k == "@type" || k == "sctap:shortId" %>
-            <% if k == "dc:title" %>
-            <tr>
-              <td><%= k %></td>
-              <td><input type="text" name="title" placeholder="<%= v %>"></input></td>
-            </tr>
-            <% else %>
-            <tr>
-              <td><%= k %></td>
-              <td><input type="text" name="<%= k %>" placeholder="<%= v %>"></input></td>
-            </tr>
-            <% end %>
-          <% end %>
-          <% end %>
+        <tr>
+          <td><%= k %></td>
+          <td><%= v %></td>
+        </tr>
+        <% end %>
       </table>
-      <input type="hidden" name="id" value="<%= @content["sctap:shortId"] %>"/></td>
-      <input type="hidden" name="sha" value="<%= @data["sha"] %>"/></td>
-      <input type="submit"/></td>
-    </form>
+    <% else %>
+    <p>No master record exists. Awaiting accepted pull request</p>
+    <p>Click here to view pull request status</p>
+    <% end %>
+  </div>
+  <div class="col-md-6">
+    <h2>My Branch Record <%= @branch_content["dc:title"] %></h2>
+    <p>Current record hash: <%= @branch_data["sha"] %></h2>
+    <p>Current path: <a href="<%= @branch_data["url"] %>"><%= @branch_data["url"] %></a></h2>
+    <table>
+      <% @branch_content.each do |k,v| %>
+      <tr>
+        <td><%= k %></td>
+        <td><%= v %></td>
+      </tr>
+      <% end %>
+    </table>
+  </div>
+  <div class="col-md-6">
+    <h1>Edit Record</h2>
+    <p>Pre filled from
+      <% if @edit_branch_title == "master" %>
+        <%= @edit_branch_title %>. <a href="<%= @edit_branch_content["sctap:shortid"] %>?branch=develop">fill from my branch</a>
+      <% else %>
+        <%= @edit_branch_title %>. <a href="<%= @edit_branch_content["sctap:shortid"] %>">fill from master</a>
+      <% end %>
+    </p>
+      <form method="post" action="update">
+        <table>
+          <% @edit_branch_content.each do |k,v| %>
+            <% unless k === "@context" || k == "@id" || k == "@type" || k == "sctap:shortId" %>
+              <% if k == "dc:title" %>
+              <tr>
+                <td><%= k %></td>
+                <td><input type="text" name="title" value="<%= v %>"></input></td>
+              </tr>
+              <% else %>
+              <tr>
+                <td><%= k %></td>
+                <td><input style="width: 150%" type="text" name="<%= k %>" value="<%= v %>"></input></td>
+              </tr>
+              <% end %>
+            <% end %>
+            <% end %>
+        </table>
+        <input type="hidden" name="id" value="<%= @branch_content["sctap:shortId"] %>"/></td>
+        <input type="hidden" name="sha" value="<%= @branch_data["sha"] %>"/></td>
+        <input type="submit"/></td>
+      </form>
+    </div>
+</div>
