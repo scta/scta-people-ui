@@ -1,0 +1,37 @@
+<div>
+  <h1><%= @content["dc:title"] %></h1>
+  <p>Current record hash: <%= @data["sha"] %></h2>
+  <p>Current path: <a href="<%= @data["url"] %>"><%= @data["url"] %></a></h2>
+  <table>
+    <% @content.each do |k,v| %>
+    <tr>
+      <td><%= k %></td>
+      <td><%= v %></td>
+    </tr>
+    <% end %>
+  </table>
+</div>
+<div>
+  <h1>Edit Record</h2>
+    <form method="post" action="update">
+      <table>
+        <% @content.each do |k,v| %>
+          <% unless k === "@context" || k == "@id" || k == "@type" || k == "sctap:shortId" %>
+            <% if k == "dc:title" %>
+            <tr>
+              <td><%= k %></td>
+              <td><input type="text" name="title" placeholder="<%= v %>"></input></td>
+            </tr>
+            <% else %>
+            <tr>
+              <td><%= k %></td>
+              <td><input type="text" name="<%= k %>" placeholder="<%= v %>"></input></td>
+            </tr>
+            <% end %>
+          <% end %>
+          <% end %>
+      </table>
+      <input type="hidden" name="id" value="<%= @content["sctap:shortId"] %>"/></td>
+      <input type="hidden" name="sha" value="<%= @data["sha"] %>"/></td>
+      <input type="submit"/></td>
+    </form>
