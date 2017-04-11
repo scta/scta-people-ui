@@ -135,13 +135,13 @@ get '/:shortid' do |shortid|
   @branch_content = JSON.parse(Base64.decode64(@branch_data["content"]))
 
   @edit_branch_content =
-  if params[:branch] == "master" then
+  if params[:branch] == "master" || params[:branch].nil? then
     if @data != false
       @content
     else
       @branch_content
     end
-  else 
+  else
     @branch_content
   end
   erb :people_editor
